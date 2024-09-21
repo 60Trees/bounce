@@ -1,4 +1,4 @@
-import pygame
+import pygame, os, math
 
 pygame.init()
 
@@ -44,6 +44,17 @@ class Assets():
                         self.pushing = pygame.image.load("textures/gui/other/_drawerTilePushedBeing.png")
                         self.push = pygame.image.load("textures/gui/other/_drawerTilePushed.png")
                 self.drawer = Drawer()
+
+                class Animation():
+                    def __init__(self) -> None:
+                        self.blockGlintStages = []
+
+                        _, _, files = next(os.walk("textures/gui/other/anim"))
+
+                        for i in range(len(files)):
+                            self.blockGlintStages.append(pygame.image.load("textures/gui/other/anim/animStage" + str(i + 1) + ".png"))
+
+                self.anim = Animation()
         self.GUI = Gui()
 
         class Blocks():
@@ -98,30 +109,35 @@ class Gui():
                         "text": "Hello!",
                         "font": assets.GUI.font.minecraftTen,
                         "img": assets.BLOCKS.pumpkin,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Goodbye!",
                         "font": assets.GUI.font.minecraft.regualr,
                         "img": assets.BLOCKS.soul_sand,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Bonjour!",
                         "font": assets.GUI.font.minecraft.bold,
                         "img": assets.BLOCKS.emerald_block,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Au revoir!",
                         "font": assets.GUI.font.minecraft.italic,
                         "img": assets.BLOCKS.note_block,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Comment vas-tu?",
                         "font": assets.GUI.font.minecraft.bold_italic,
                         "img": assets.BLOCKS.hay,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                 ]
         self.data = Data()
@@ -139,6 +155,7 @@ class Gui():
     
     def redrawGUI(self):
         changed = False
+        doGlint = False
         defState = self.getImgDrawerFromStr("default")
         mp = pygame.mouse.get_pressed()[0]
 
@@ -158,6 +175,7 @@ class Gui():
                 #if self.buttonpressed == i:
                 #    self.buttonpressed = -1
                 #else:
+                doGlint = True
                 self.buttonpressed = i
                 self.is_mbu = False
             self.GUISurface.blit(
@@ -208,6 +226,26 @@ class Gui():
                     ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + (self.scale * 1 if self.data.drawer[i]["font"] != assets.GUI.font.minecraftTen else self.scale * 2)
                 )
             )
+            try:
+                if doGlint:
+                    self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
+                doGlint = False
+                img = assets.GUI.anim.blockGlintStages[math.floor(self.data.drawer[i]["imgAnimState"])]
+                self.GUISurface.blit(
+                    pygame.transform.scale(
+                        img,
+                        (
+                            img.get_width() * self.scale,
+                            img.get_height() * self.scale
+                        )
+                    ),
+                    (
+                        self.scale * 3,
+                        (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
+                    )
+                )
+                self.data.drawer[i]["imgAnimState"] += 0.5
+            except IndexError: pass
 
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
