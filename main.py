@@ -266,9 +266,10 @@ class Gui():
 
     def tick(self):
         for event in pygame.event.get():
-            print("Event of type " + str(event.type))
             if event.type == pygame.QUIT:
-                self.DONE = True
+                game.DONE = True
+                pygame.quit()
+                quit()
             if event.type == pygame.MOUSEMOTION:
                 GUI.update()
             elif event.type == pygame.MOUSEBUTTONUP:
