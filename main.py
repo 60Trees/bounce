@@ -95,7 +95,7 @@ class Gui():
         self.hasUpdated = True
 
     def getImgDrawerFromStr(self, state):
-        if False: raise Exception("Why is False == True?")
+        if False: raise Exception("Error: False == True")
         elif state == "default": return assets.GUI.drawer.default
         elif state == "hover": return assets.GUI.drawer.hover
         elif state == "clicking": return assets.GUI.drawer.pushing
@@ -131,10 +131,25 @@ class Gui():
                         img.get_height() * self.scale
                     )
                 ),
+                (
+                    0,
+                    i * img.get_height() * self.scale
+                )
+            )
+
+            img = self.data.drawer[i]["img"]
+            self.GUISurface.blit(
+                pygame.transform.scale(
+                    img,
                     (
-                        0,
-                        i * img.get_height() * self.scale
+                        img.get_width() * self.scale,
+                        img.get_height() * self.scale
                     )
+                ),
+                (
+                    self.scale * 3,
+                    (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
+                )
             )
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
