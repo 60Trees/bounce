@@ -103,6 +103,7 @@ class Gui():
         self.scale = 4
         class Data():
             def __init__(self) -> None:
+                self.drawerX = 0
                 self.drawer = [
                     {
                         "state": "default",
@@ -159,8 +160,21 @@ class Gui():
         defState = self.getImgDrawerFromStr("default")
         mp = pygame.mouse.get_pressed()[0]
 
-        for i in range(len(self.data.drawer) + 1):
-          if i != len(self.data.drawer):
+        img = self.getImgDrawerFromStr("default")
+        self.GUISurface.blit(
+            pygame.transform.scale(
+                img,
+                (
+                    img.get_width() * self.scale,
+                    WIN.get_height()
+                )
+            ),
+            (
+                0,
+                0
+            )
+        )
+        for i in range(len(self.data.drawer)):
             pos = (0, i * defState.get_height() * self.scale)
             coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
             if coll:
@@ -245,21 +259,6 @@ class Gui():
                 )
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
-          else:
-            img = self.getImgDrawerFromStr("default")
-            self.GUISurface.blit(
-                pygame.transform.scale(
-                    img,
-                    (
-                        img.get_width() * self.scale,
-                        WIN.get_height() - i * img.get_height() * self.scale
-                    )
-                ),
-                (
-                    0,
-                    i * img.get_height() * self.scale
-                )
-            )
 
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
