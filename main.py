@@ -8,11 +8,35 @@ clock = pygame.time.Clock()
 winSize = (1000, 600)
 WIN = pygame.display.set_mode(winSize)
 
+# I did not make the "fill(surface, color)" function. Big thanks to Stack Overflow (https://stackoverflow.com/questions/42821442/how-do-i-change-the-colour-of-an-image-in-pygame-without-changing-its-transparen)
+def fill(surface, color):
+    """Fill all pixels of the surface with color, preserve transparency."""
+    w, h = surface.get_size()
+    r, g, b, _ = color
+    for x in range(w):
+        for y in range(h):
+            a = surface.get_at((x, y))[3]
+            surface.set_at((x, y), pygame.Color(r, g, b, a))
+
 # Assets class...
 class Assets():
     def __init__(self) -> None:
         class Gui():
             def __init__(self) -> None:
+                class Font():
+                    def __init__(self) -> None:
+                        size = 64
+                        class Minecraft():
+                            def __init__(self) -> None:
+                                self.bold = pygame.font.Font('textures/gui/font/Minecraft Bold.otf', size)
+                                self.italic = pygame.font.Font('textures/gui/font/Minecraft Italic.otf', size)
+                                self.regualr = pygame.font.Font('textures/gui/font/Minecraft.otf', size)
+                                self.bold_italic = pygame.font.Font('textures/gui/font/Minecraft Bold-Italic.otf', size)
+                        self.minecraft = Minecraft()
+
+                        self.minecraftTen = pygame.font.Font('textures/gui/font/Minecraft Ten.ttf', size)
+                self.font = Font()
+
                 class Drawer():
                     def __init__(self) -> None:
                         self.default = pygame.image.load("textures/gui/other/_drawerTile.png")
@@ -25,6 +49,12 @@ class Assets():
         class Blocks():
             def __init__(self) -> None:
                 self.pumpkin = pygame.image.load("textures/pumpkin_side.png")
+                self.glass = pygame.image.load("textures/glass.png")
+                self.hay = pygame.image.load("textures/hay_block_side.png")
+                self.note_block = pygame.image.load("textures/note_block.png")
+                self.emerald_block = pygame.image.load("textures/emerald_block.png")
+                self.wool = pygame.image.load("textures/light_blue_wool.png")
+                self.soul_sand = pygame.image.load("textures/soul_sand.png")
         self.BLOCKS = Blocks()
 
     def refreshAssets(self):
@@ -66,27 +96,32 @@ class Gui():
                     {
                         "state": "default",
                         "text": "Hello!",
+                        "font": assets.GUI.font.minecraftTen,
                         "img": assets.BLOCKS.pumpkin,
                     },
                     {
                         "state": "default",
                         "text": "Goodbye!",
-                        "img": assets.BLOCKS.pumpkin,
+                        "font": assets.GUI.font.minecraft.regualr,
+                        "img": assets.BLOCKS.soul_sand,
                     },
                     {
                         "state": "default",
                         "text": "Bonjour!",
-                        "img": assets.BLOCKS.pumpkin,
+                        "font": assets.GUI.font.minecraft.bold,
+                        "img": assets.BLOCKS.emerald_block,
                     },
                     {
                         "state": "default",
                         "text": "Au revoir!",
-                        "img": assets.BLOCKS.pumpkin,
+                        "font": assets.GUI.font.minecraft.italic,
+                        "img": assets.BLOCKS.note_block,
                     },
                     {
                         "state": "default",
                         "text": "Comment vas-tu?",
-                        "img": assets.BLOCKS.pumpkin,
+                        "font": assets.GUI.font.minecraft.bold_italic,
+                        "img": assets.BLOCKS.hay,
                     },
                 ]
         self.data = Data()
@@ -106,6 +141,7 @@ class Gui():
         changed = False
         defState = self.getImgDrawerFromStr("default")
         mp = pygame.mouse.get_pressed()[0]
+
         for i in range(len(self.data.drawer)):
             pos = (0, i * defState.get_height() * self.scale)
             coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
@@ -117,6 +153,7 @@ class Gui():
                 img = self.getImgDrawerFromStr("hover")
             else:
                 img = self.getImgDrawerFromStr(["default", "pushed"][self.buttonpressed == i])
+            if coll and self.buttonpressed == i: changed = False
             if self.is_mbu and coll:
                 #if self.buttonpressed == i:
                 #    self.buttonpressed = -1
@@ -151,6 +188,27 @@ class Gui():
                     (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
                 )
             )
+            
+            img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
+
+            print("Index:" + str(i) + ", Text: " + str(self.data.drawer[i]["text"]))
+    
+            img = pygame.transform.scale(
+                img,
+                (
+                    img.get_width() * self.scale / 4,
+                    img.get_height() * self.scale / 4
+                )
+            )
+
+            self.GUISurface.blit(
+                img,
+                (
+                    self.scale * 4 + self.data.drawer[i]["img"].get_width() * self.scale + self.scale,
+                    ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + (self.scale * 1 if self.data.drawer[i]["font"] != assets.GUI.font.minecraftTen else self.scale * 2)
+                )
+            )
+
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
 
