@@ -57,6 +57,8 @@ class Gui():
     def __init__(self) -> None:
         self.GUISurface = pygame.display.set_mode(winSize)
         self.hasUpdated = False
+        self.is_mbu = False # IS Mouse Button Up
+        self.buttonpressed = 0#-1
         self.scale = 4
         class Data():
             def __init__(self) -> None:
@@ -96,29 +98,31 @@ class Gui():
         if False: raise Exception("Why is False == True?")
         elif state == "default": return assets.GUI.drawer.default
         elif state == "hover": return assets.GUI.drawer.hover
-        elif state == "pushing": return assets.GUI.drawer.pushing
-        elif state == "push": return assets.GUI.drawer.push
+        elif state == "clicking": return assets.GUI.drawer.pushing
+        elif state == "pushed": return assets.GUI.drawer.push
         else: raise TypeError("state is invalid.")
     
     def redrawGUI(self):
+        changed = False
+        defState = self.getImgDrawerFromStr("default")
+        mp = pygame.mouse.get_pressed()[0]
         for i in range(len(self.data.drawer)):
-            img = self.getImgDrawerFromStr(self.data.drawer[i]["state"]) # For simplicity.
-
-            if self.data.drawer[i]["state"] == "hover": self.data.drawer[i]["state"] = "default"
-
-            if inp.mouse.mousePosX < img.get_width() * self.scale:
-                print(f"MX ({inp.mouse.mousePosX}) < {img.get_width() * self.scale}, b1")
-
-                if inp.mouse.mousePosY > img.get_height() * self.scale * i:
-                    print(f"MY ({inp.mouse.mousePosY}) < {img.get_height() * self.scale * i}, b2")
-
-                    if inp.mouse.mousePosY < img.get_height() * (i + 1) * self.scale:
-                        print(f"MY ({inp.mouse.mousePosY}) < {img.get_height() * (i + 1) * self.scale}, b3. Done")
-
-                        self.data.drawer[i]["state"] = "hover"
-            
-            img = self.getImgDrawerFromStr(self.data.drawer[i]["state"]) # For simplicity.
-
+            pos = (0, i * defState.get_height() * self.scale)
+            coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
+            if coll:
+                changed = True
+            if mp and coll:
+                img = self.getImgDrawerFromStr("clicking")
+            elif coll and self.buttonpressed != i:
+                img = self.getImgDrawerFromStr("hover")
+            else:
+                img = self.getImgDrawerFromStr(["default", "pushed"][self.buttonpressed == i])
+            if self.is_mbu and coll:
+                #if self.buttonpressed == i:
+                #    self.buttonpressed = -1
+                #else:
+                self.buttonpressed = i
+                self.is_mbu = False
             self.GUISurface.blit(
                 pygame.transform.scale(
                     img,
@@ -133,6 +137,7 @@ class Gui():
                     )
             )
         self.hasUpdated = False
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
 
     def tick(self):
         for event in pygame.event.get():
@@ -141,6 +146,8 @@ class Gui():
                 self.DONE = True
             if event.type == pygame.MOUSEMOTION:
                 GUI.update()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                GUI.is_mbu = True
 GUI = Gui()
 
 # Game class...
