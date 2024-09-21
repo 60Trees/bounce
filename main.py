@@ -159,7 +159,8 @@ class Gui():
         defState = self.getImgDrawerFromStr("default")
         mp = pygame.mouse.get_pressed()[0]
 
-        for i in range(len(self.data.drawer)):
+        for i in range(len(self.data.drawer) + 1):
+          if i != len(self.data.drawer):
             pos = (0, i * defState.get_height() * self.scale)
             coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
             if coll:
@@ -208,8 +209,6 @@ class Gui():
             )
             
             img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
-
-            print("Index:" + str(i) + ", Text: " + str(self.data.drawer[i]["text"]))
     
             img = pygame.transform.scale(
                 img,
@@ -246,13 +245,28 @@ class Gui():
                 )
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
+          else:
+            img = self.getImgDrawerFromStr("default")
+            self.GUISurface.blit(
+                pygame.transform.scale(
+                    img,
+                    (
+                        img.get_width() * self.scale,
+                        WIN.get_height() - i * img.get_height() * self.scale
+                    )
+                ),
+                (
+                    0,
+                    i * img.get_height() * self.scale
+                )
+            )
 
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
 
     def tick(self):
         for event in pygame.event.get():
-            #print("Event of type " + str(event.type))
+            print("Event of type " + str(event.type))
             if event.type == pygame.QUIT:
                 self.DONE = True
             if event.type == pygame.MOUSEMOTION:
