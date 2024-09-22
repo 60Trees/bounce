@@ -1,4 +1,4 @@
-import pygame, os, math
+import pygame, os, math, copy
 
 pygame.init()
 
@@ -8,15 +8,20 @@ clock = pygame.time.Clock()
 winSize = (1000, 600)
 WIN = pygame.display.set_mode(winSize)
 
-# I did not make the "fill(surface, color)" function. Big thanks to Stack Overflow (https://stackoverflow.com/questions/42821442/how-do-i-change-the-colour-of-an-image-in-pygame-without-changing-its-transparen)
-def fill(surface, color):
-    """Fill all pixels of the surface with color, preserve transparency."""
+def recolourImage(surface, colour):
+    surface = surface.convert_alpha()
     w, h = surface.get_size()
-    r, g, b, _ = color
+
+    colored_image = pygame.Surface((w, h), pygame.SRCALPHA)
+    
     for x in range(w):
         for y in range(h):
-            a = surface.get_at((x, y))[3]
-            surface.set_at((x, y), pygame.Color(r, g, b, a))
+            pixel_color = surface.get_at((x, y))
+            a = pixel_color[3] / 255.0
+            if a > 0:
+                new_color = (colour[0], colour[1], colour[2], int(a * 255))
+                colored_image.set_at((x, y), new_color)
+    return colored_image
 
 # Assets class...
 class Assets():
@@ -204,6 +209,21 @@ class Gui():
                 (
                     0,
                     i * img.get_height() * self.scale
+                )
+            )
+
+            img = self.data.drawer[i]["img"]
+            self.GUISurface.blit(
+                pygame.transform.scale(
+                    recolourImage(img, (0, 0, 0)),
+                    (
+                        img.get_width() * self.scale,
+                        img.get_height() * self.scale
+                    )
+                ),
+                (
+                    self.scale * 3 + self.scale * 1,
+                    (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + self.scale
                 )
             )
 
