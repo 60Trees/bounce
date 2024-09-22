@@ -4,6 +4,8 @@ pygame.init()
 
 clock = pygame.time.Clock()
 
+GUI_SCALE = 3
+
 # Window size, change as you wish
 winSize = (1000, 600)
 WIN = pygame.display.set_mode(winSize)
@@ -30,16 +32,16 @@ class Assets():
             def __init__(self) -> None:
                 class Font():
                     def __init__(self) -> None:
-                        size = 64
+                        size = GUI_SCALE * 16
                         class Minecraft():
                             def __init__(self) -> None:
                                 self.bold = pygame.font.Font('textures/gui/font/Minecraft Bold.otf', size)
                                 self.italic = pygame.font.Font('textures/gui/font/Minecraft Italic.otf', size)
                                 self.regualr = pygame.font.Font('textures/gui/font/Minecraft.otf', size)
                                 self.bold_italic = pygame.font.Font('textures/gui/font/Minecraft Bold-Italic.otf', size)
+                                self.ten = pygame.font.Font('textures/gui/font/Minecraft Ten.ttf', size)
                         self.minecraft = Minecraft()
 
-                        self.minecraftTen = pygame.font.Font('textures/gui/font/Minecraft Ten.ttf', size)
                 self.font = Font()
 
                 class Drawer():
@@ -105,42 +107,42 @@ class Gui():
         self.hasUpdated = False
         self.is_mbu = False # IS Mouse Button Up
         self.buttonpressed = 0#-1
-        self.scale = 4
+        self.scale = GUI_SCALE
         class Data():
             def __init__(self) -> None:
                 self.drawerX = 0
                 self.drawer = [
                     {
                         "state": "default",
-                        "text": "Hello!",
-                        "font": assets.GUI.font.minecraftTen,
-                        "img": assets.BLOCKS.pumpkin,
+                        "text": "My Projects",
+                        "font": assets.GUI.font.minecraft.bold,
+                        "img": assets.BLOCKS.note_block,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
-                        "text": "Goodbye!",
+                        "text": "Options",
                         "font": assets.GUI.font.minecraft.regualr,
                         "img": assets.BLOCKS.soul_sand,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
-                        "text": "Bonjour!",
+                        "text": "Settings",
                         "font": assets.GUI.font.minecraft.bold,
                         "img": assets.BLOCKS.emerald_block,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
-                        "text": "Au revoir!",
+                        "text": "Help",
                         "font": assets.GUI.font.minecraft.italic,
                         "img": assets.BLOCKS.note_block,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
-                        "text": "Comment vas-tu?",
+                        "text": "Credits",
                         "font": assets.GUI.font.minecraft.bold_italic,
                         "img": assets.BLOCKS.hay,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
@@ -160,6 +162,9 @@ class Gui():
         else: raise TypeError("state is invalid.")
     
     def redrawGUI(self):
+        global GUI_SCALE
+        if self.scale != GUI_SCALE:
+            GUI_SCALE = self.scale
         changed = False
         doGlint = False
         defState = self.getImgDrawerFromStr("default")
@@ -243,22 +248,21 @@ class Gui():
             )
             
             img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
-    
-            img = pygame.transform.scale(
-                img,
-                (
-                    img.get_width() * self.scale / 4,
-                    img.get_height() * self.scale / 4
-                )
-            )
 
             self.GUISurface.blit(
-                img,
+                pygame.transform.scale(
+                    img,
+                    (
+                        img.get_width() * self.scale / 4,
+                        img.get_height() * self.scale / 4
+                    )
+                ),
                 (
-                    self.scale * 4 + self.data.drawer[i]["img"].get_width() * self.scale + self.scale,
-                    ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + (self.scale * 1 if self.data.drawer[i]["font"] != assets.GUI.font.minecraftTen else self.scale * 2)
+                    self.scale * 22,
+                    ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) - self.scale * 4
                 )
             )
+            
             try:
                 if doGlint:
                     self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
@@ -285,14 +289,22 @@ class Gui():
 
     def tick(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if False: raise Exception("Error: False == True")
+            elif event.type == pygame.QUIT:
                 game.DONE = True
                 pygame.quit()
                 quit()
-            if event.type == pygame.MOUSEMOTION:
+            elif event.type == pygame.MOUSEMOTION:
                 GUI.update()
             elif event.type == pygame.MOUSEBUTTONUP:
                 GUI.is_mbu = True
+            if event.type == pygame.KEYDOWN:
+                if False: raise Exception("Error: False == True")
+                elif event.key == pygame.K_MINUS:
+                    self.scale -= 1
+                elif event.key == pygame.K_EQUALS:
+                    self.scale += 1
+            
 GUI = Gui()
 
 # Game class...
