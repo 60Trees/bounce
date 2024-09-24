@@ -132,6 +132,7 @@ class Gui():
         self.scale = GUI_SCALE
         class Data():
             def __init__(self) -> None:
+                self.isStartupTick = True
                 self.drawerX_True = 0
                 self.drawerX = self.drawerX_True
                 self.drawerX += (self.drawerX - self.drawerX_True) / 2
@@ -172,13 +173,6 @@ class Gui():
                         "img": assets.BLOCKS.hay,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
-                    {
-                        "state": "default",
-                        "text": f"{self.drawerX}, {self.drawerX_True}",
-                        "font": assets.GUI.font.minecraft.bold_italic,
-                        "img": assets.BLOCKS.hay,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
                 ]
         self.data = Data()
 
@@ -195,20 +189,21 @@ class Gui():
     
     def redrawGUI(self):
         self.SidebarGUI_underlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
-        self.SidebarGUI_overlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
         self.SidebarGUI_overoverlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
         
         self.SidebarGUI_underlay.fill((1, 2, 3))
-        self.SidebarGUI_overlay.fill((1, 2, 3))
         self.SidebarGUI_overoverlay.fill((1, 2, 3))
         
         self.SidebarGUI_underlay.set_colorkey((1, 2, 3))
-        self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
         self.SidebarGUI_overoverlay.set_colorkey((1, 2, 3))
+        
+        if self.data.isStartupTick:
+            self.SidebarGUI_overlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+            self.SidebarGUI_overlay.fill((1, 2, 3))
+            self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
 
         self.GUISurface = pygame.Surface(winSize)
         
-        self.data.drawer[5]["text"] = f"{self.data.drawerX}, {self.data.drawerX_True}"
         global GUI_SCALE
         if self.scale != GUI_SCALE:
             GUI_SCALE = self.scale
@@ -267,7 +262,9 @@ class Gui():
             )
 
 
-            if True:
+            if self.data.isStartupTick:
+                        
+                
                 img = self.data.drawer[i]["img"]
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
@@ -312,6 +309,7 @@ class Gui():
                         ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) - self.scale * 4
                     )
                 )
+
                 
             try:
                 if doGlint:
@@ -334,6 +332,7 @@ class Gui():
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
 
+        self.data.isStartupTick = False
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
         
