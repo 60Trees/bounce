@@ -110,9 +110,6 @@ class Input():
         self.mouse.mousePosX, self.mouse.mousePosY = self.mouse.mousePos
 inp = Input()
 
-print(f"Selected file: {inp.getFile()}")
-print(f"Selected folder: {inp.getFolder()}")
-
 # GUI class...
 class Gui():
     def __init__(self) -> None:
@@ -126,7 +123,9 @@ class Gui():
         self.scale = GUI_SCALE
         class Data():
             def __init__(self) -> None:
-                self.drawerX = 0
+                self.drawerX_True = 0
+                self.drawerX = self.drawerX_True
+                self.drawerX += (self.drawerX - self.drawerX_True) / 2
                 self.drawer = [
                     {
                         "state": "default",
@@ -163,6 +162,13 @@ class Gui():
                         "img": assets.BLOCKS.hay,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
+                    {
+                        "state": "default",
+                        "text": f"{self.drawerX}, {self.drawerX_True}",
+                        "font": assets.GUI.font.minecraft.bold_italic,
+                        "img": assets.BLOCKS.hay,
+                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
+                    },
                 ]
         self.data = Data()
 
@@ -178,6 +184,7 @@ class Gui():
         else: raise TypeError("state is invalid.")
     
     def redrawGUI(self):
+        self.data.drawer[5]["text"] = f"{self.data.drawerX}, {self.data.drawerX_True}"
         global GUI_SCALE
         if self.scale != GUI_SCALE:
             GUI_SCALE = self.scale
@@ -304,9 +311,9 @@ class Gui():
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
 
-        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0))
-        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0))
-        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0))
+        self.GUISurface.blit(self.SidebarGUI_underlay, (self.data.drawerX, 0))
+        self.GUISurface.blit(self.SidebarGUI_overlay, (self.data.drawerX, 0))
+        self.GUISurface.blit(self.SidebarGUI_overoverlay, (self.data.drawerX, 0))
 
     def tick(self):
         for event in pygame.event.get():
@@ -322,9 +329,18 @@ class Gui():
             if event.type == pygame.KEYDOWN:
                 if False: raise Exception("Error: False == True")
                 elif event.key == pygame.K_MINUS:
-                    self.scale -= 1
+                    if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
+                        self.scale -= 1
+                    else:
+                        self.data.drawerX_True -= 10
                 elif event.key == pygame.K_EQUALS:
-                    self.scale += 1
+                    if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
+                        self.scale += 1
+                    else:
+                        self.data.drawerX_True += 10
+                     
+        self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 8
+        self.data.drawerX = round(self.data.drawerX * 1000) / 1000
             
 GUI = Gui()
 
@@ -350,7 +366,7 @@ while not game.DONE:
     GUI.tick()
 
     GUI.redrawGUI()
-    WIN.blit(GUI.SidebarGUI_underlay, (0, 0))
+    WIN.blit(GUI.GUISurface, (0, 0))
 
     game.isSetupTick = False
 
