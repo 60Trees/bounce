@@ -113,11 +113,20 @@ inp = Input()
 # GUI class...
 class Gui():
     def __init__(self) -> None:
-        self.SidebarGUI_underlay = pygame.display.set_mode(winSize)
-        self.SidebarGUI_overlay = pygame.display.set_mode(winSize)
-        self.SidebarGUI_overoverlay = pygame.display.set_mode(winSize)
-        self.GUISurface = pygame.display.set_mode(winSize)
-        self.hasUpdated = False
+        self.SidebarGUI_underlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        self.SidebarGUI_overlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        self.SidebarGUI_overoverlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        
+        self.SidebarGUI_underlay.fill((1, 2, 3))
+        self.SidebarGUI_overlay.fill((1, 2, 3))
+        self.SidebarGUI_overoverlay.fill((1, 2, 3))
+        
+        self.SidebarGUI_underlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_overoverlay.set_colorkey((1, 2, 3))
+        
+        self.GUISurface = pygame.Surface(winSize)
+        self.hasUpdated = True
         self.is_mbu = False # IS Mouse Button Up
         self.buttonpressed = 0#-1
         self.scale = GUI_SCALE
@@ -126,6 +135,7 @@ class Gui():
                 self.drawerX_True = 0
                 self.drawerX = self.drawerX_True
                 self.drawerX += (self.drawerX - self.drawerX_True) / 2
+                self.drawerIsOpen = False
                 self.drawer = [
                     {
                         "state": "default",
@@ -184,6 +194,20 @@ class Gui():
         else: raise TypeError("state is invalid.")
     
     def redrawGUI(self):
+        self.SidebarGUI_underlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        self.SidebarGUI_overlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        self.SidebarGUI_overoverlay = pygame.Surface(winSize, pygame.SRCALPHA, 32).convert_alpha()
+        
+        self.SidebarGUI_underlay.fill((1, 2, 3))
+        self.SidebarGUI_overlay.fill((1, 2, 3))
+        self.SidebarGUI_overoverlay.fill((1, 2, 3))
+        
+        self.SidebarGUI_underlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_overoverlay.set_colorkey((1, 2, 3))
+
+        self.GUISurface = pygame.Surface(winSize)
+        
         self.data.drawer[5]["text"] = f"{self.data.drawerX}, {self.data.drawerX_True}"
         global GUI_SCALE
         if self.scale != GUI_SCALE:
@@ -240,22 +264,22 @@ class Gui():
                 )
             )
 
-            img = self.data.drawer[i]["img"]
-            self.SidebarGUI_overlay.blit(
-                pygame.transform.scale(
-                    recolourImage(img, (0, 0, 0)),
-                    (
-                        img.get_width() * self.scale,
-                        img.get_height() * self.scale
-                    )
-                ),
-                (
-                    self.scale * 3 + self.scale * 1,
-                    (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + self.scale
-                )
-            )
 
             if True:
+                img = self.data.drawer[i]["img"]
+                self.SidebarGUI_overlay.blit(
+                    pygame.transform.scale(
+                        recolourImage(img, (0, 0, 0)),
+                        (
+                            img.get_width() * self.scale,
+                            img.get_height() * self.scale
+                        )
+                    ),
+                    (
+                        self.scale * 3 + self.scale,
+                        (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + self.scale
+                    )
+                )
                 img = self.data.drawer[i]["img"]
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
@@ -310,10 +334,10 @@ class Gui():
 
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
-
-        self.GUISurface.blit(self.SidebarGUI_underlay, (self.data.drawerX, 0))
-        self.GUISurface.blit(self.SidebarGUI_overlay, (self.data.drawerX, 0))
-        self.GUISurface.blit(self.SidebarGUI_overoverlay, (self.data.drawerX, 0))
+        
+        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
+        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
+        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
 
     def tick(self):
         for event in pygame.event.get():
@@ -322,8 +346,9 @@ class Gui():
                 game.DONE = True
                 pygame.quit()
                 quit()
-            elif event.type == pygame.MOUSEMOTION:
+            elif event.type == pygame.MOUSEMOTION and inp.mouse.mousePosX < self.data.drawerX:
                 GUI.update()
+                self.data.drawerIsOpen = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 GUI.is_mbu = True
             if event.type == pygame.KEYDOWN:
@@ -338,9 +363,16 @@ class Gui():
                         self.scale += 1
                     else:
                         self.data.drawerX_True += 10
-                     
-        self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 8
-        self.data.drawerX = round(self.data.drawerX * 1000) / 1000
+
+        if inp.mouse.mousePosX > self.data.drawerX:
+            self.data.drawerIsOpen = False
+
+        if self.data.drawerIsOpen:
+            self.data.drawerX_True = assets.GUI.drawer.default.get_width() * self.scale
+        else:
+            self.data.drawerX_True = self.scale * 22
+        
+        self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 4
             
 GUI = Gui()
 
