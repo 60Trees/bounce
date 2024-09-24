@@ -1,4 +1,5 @@
-import pygame, os, math, copy
+from tkinter import filedialog
+import pygame, os, math, copy, tkinter
 
 pygame.init()
 
@@ -80,6 +81,15 @@ class Assets():
 assets = Assets()
 # Input class...
 class Input():
+
+    def getFile(self):
+        file_name = filedialog.askopenfilename()
+        return file_name
+
+    def getFolder(self):
+        folder_path = filedialog.askdirectory()
+        return folder_path
+
     def __init__(self) -> None:
         class Keyboard():
             def __init__(self) -> None:
@@ -100,9 +110,15 @@ class Input():
         self.mouse.mousePosX, self.mouse.mousePosY = self.mouse.mousePos
 inp = Input()
 
+print(f"Selected file: {inp.getFile()}")
+print(f"Selected folder: {inp.getFolder()}")
+
 # GUI class...
 class Gui():
     def __init__(self) -> None:
+        self.SidebarGUI_underlay = pygame.display.set_mode(winSize)
+        self.SidebarGUI_overlay = pygame.display.set_mode(winSize)
+        self.SidebarGUI_overoverlay = pygame.display.set_mode(winSize)
         self.GUISurface = pygame.display.set_mode(winSize)
         self.hasUpdated = False
         self.is_mbu = False # IS Mouse Button Up
@@ -171,7 +187,7 @@ class Gui():
         mp = pygame.mouse.get_pressed()[0]
 
         img = self.getImgDrawerFromStr("default")
-        self.GUISurface.blit(
+        self.SidebarGUI_underlay.blit(
             pygame.transform.scale(
                 img,
                 (
@@ -203,7 +219,7 @@ class Gui():
                 doGlint = True
                 self.buttonpressed = i
                 self.is_mbu = False
-            self.GUISurface.blit(
+            self.SidebarGUI_underlay.blit(
                 pygame.transform.scale(
                     img,
                     (
@@ -218,7 +234,7 @@ class Gui():
             )
 
             img = self.data.drawer[i]["img"]
-            self.GUISurface.blit(
+            self.SidebarGUI_overlay.blit(
                 pygame.transform.scale(
                     recolourImage(img, (0, 0, 0)),
                     (
@@ -232,43 +248,44 @@ class Gui():
                 )
             )
 
-            img = self.data.drawer[i]["img"]
-            self.GUISurface.blit(
-                pygame.transform.scale(
-                    img,
+            if True:
+                img = self.data.drawer[i]["img"]
+                self.SidebarGUI_overlay.blit(
+                    pygame.transform.scale(
+                        img,
+                        (
+                            img.get_width() * self.scale,
+                            img.get_height() * self.scale
+                        )
+                    ),
                     (
-                        img.get_width() * self.scale,
-                        img.get_height() * self.scale
+                        self.scale * 3,
+                        (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
                     )
-                ),
-                (
-                    self.scale * 3,
-                    (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
                 )
-            )
-            
-            img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
+                
+                img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
 
-            self.GUISurface.blit(
-                pygame.transform.scale(
-                    img,
+                self.SidebarGUI_overlay.blit(
+                    pygame.transform.scale(
+                        img,
+                        (
+                            img.get_width() * self.scale / 4,
+                            img.get_height() * self.scale / 4
+                        )
+                    ),
                     (
-                        img.get_width() * self.scale / 4,
-                        img.get_height() * self.scale / 4
+                        self.scale * 22,
+                        ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) - self.scale * 4
                     )
-                ),
-                (
-                    self.scale * 22,
-                    ((i + 1) * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) - self.scale * 4
                 )
-            )
-            
+                
             try:
                 if doGlint:
                     self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
                 doGlint = False
                 img = assets.GUI.anim.blockGlintStages[math.floor(self.data.drawer[i]["imgAnimState"])]
-                self.GUISurface.blit(
+                self.SidebarGUI_overoverlay.blit(
                     pygame.transform.scale(
                         img,
                         (
@@ -286,6 +303,10 @@ class Gui():
 
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
+
+        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0))
+        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0))
+        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0))
 
     def tick(self):
         for event in pygame.event.get():
@@ -313,6 +334,7 @@ class Game():
         # Target FPS
         self.TargetFPS = 60
         self.DONE = False
+        self.isSetupTick = True
         
     def tick(self):
         # Loop code here...
@@ -328,10 +350,11 @@ while not game.DONE:
     GUI.tick()
 
     GUI.redrawGUI()
-    WIN.blit(GUI.GUISurface, (0, 0))
+    WIN.blit(GUI.SidebarGUI_underlay, (0, 0))
+
+    game.isSetupTick = False
 
     pygame.display.flip()
-
     clock.tick(game.TargetFPS)
 
 pygame.quit()
