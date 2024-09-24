@@ -233,7 +233,9 @@ class Gui():
         )
         for i in range(len(self.data.drawer)):
             pos = (0, i * defState.get_height() * self.scale)
-            coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
+            if self.data.drawerIsOpen:
+                coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
+            else: coll = False
             if coll:
                 changed = True
             if mp and coll:
@@ -341,6 +343,7 @@ class Gui():
 
     def tick(self):
         for event in pygame.event.get():
+            print(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}")
             if False: raise Exception("Error: False == True")
             elif event.type == pygame.QUIT:
                 game.DONE = True
