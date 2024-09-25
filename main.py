@@ -38,7 +38,7 @@ class Assets():
                             def __init__(self) -> None:
                                 self.bold = pygame.font.Font('textures/gui/font/Minecraft Bold.otf', size)
                                 self.italic = pygame.font.Font('textures/gui/font/Minecraft Italic.otf', size)
-                                self.regualr = pygame.font.Font('textures/gui/font/Minecraft.otf', size)
+                                self.reg = pygame.font.Font('textures/gui/font/Minecraft.otf', size)
                                 self.bold_italic = pygame.font.Font('textures/gui/font/Minecraft Bold-Italic.otf', size)
                                 self.ten = pygame.font.Font('textures/gui/font/Minecraft Ten.ttf', size)
                         self.minecraft = Minecraft()
@@ -74,6 +74,7 @@ class Assets():
                 self.emerald_block = pygame.image.load("textures/emerald_block.png")
                 self.wool = pygame.image.load("textures/light_blue_wool.png")
                 self.soul_sand = pygame.image.load("textures/soul_sand.png")
+                self.note = pygame.image.load("textures/note.png")
         self.BLOCKS = Blocks()
 
     def refreshAssets(self):
@@ -141,14 +142,14 @@ class Gui():
                     {
                         "state": "default",
                         "text": "My Projects",
-                        "font": assets.GUI.font.minecraft.bold,
+                        "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.note_block,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Options",
-                        "font": assets.GUI.font.minecraft.regualr,
+                        "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.soul_sand,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
@@ -163,7 +164,7 @@ class Gui():
                         "state": "default",
                         "text": "Help",
                         "font": assets.GUI.font.minecraft.italic,
-                        "img": assets.BLOCKS.note_block,
+                        "img": assets.BLOCKS.note,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -178,6 +179,7 @@ class Gui():
 
     def update(self):
         self.hasUpdated = True
+        self.data.isStartupTick = True
 
     def getImgDrawerFromStr(self, state):
         if False: raise Exception("Error: False == True")
@@ -310,7 +312,7 @@ class Gui():
                     )
                 )
 
-                
+            pygame.draw.rect(self.SidebarGUI_overoverlay, (30, 30, 31), pygame.Rect(self.data.drawerX - self.scale, 0, self.data.drawerX, WIN.get_height()))
             try:
                 if doGlint:
                     self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
@@ -358,13 +360,15 @@ class Gui():
                 elif event.key == pygame.K_MINUS:
                     if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
                         self.scale -= 1
+                        GUI.update()
                     else:
                         self.data.drawerX_True -= 10
                 elif event.key == pygame.K_EQUALS:
                     if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
                         self.scale += 1
+                        GUI.update()
                     else:
-                        self.data.drawerX_True += 10
+                        self.data.drawerX += 10
 
         if inp.mouse.mousePosX > self.data.drawerX:
             self.data.drawerIsOpen = False
@@ -372,7 +376,7 @@ class Gui():
         if self.data.drawerIsOpen:
             self.data.drawerX_True = assets.GUI.drawer.default.get_width() * self.scale
         else:
-            self.data.drawerX_True = self.scale * 22
+            self.data.drawerX_True = self.scale * 23
         
         self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 4
             
