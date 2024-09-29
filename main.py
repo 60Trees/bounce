@@ -1,3 +1,4 @@
+import colorsys
 from tkinter import filedialog
 import pygame, os, math, copy, tkinter
 
@@ -10,6 +11,29 @@ GUI_SCALE = 3
 # Window size, change as you wish
 winSize = (1000, 600)
 WIN = pygame.display.set_mode(winSize)
+
+def recolor_surface(sur, rgb):
+    r, g, b = rgb
+    h, _, _ = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+    colourHue = h
+    tintedSurface = pygame.Surface(sur.get_size(), pygame.SRCALPHA)
+
+    for x in range(sur.get_width()):
+        for y in range(sur.get_height()):
+            current_color = sur.get_at((x, y))
+            oV = max(current_color.r, current_color.g, current_color.b) / 255.0
+
+            nS = 1.0
+
+            nH = colourHue
+
+            # Convert HSV to RGB
+            new_r, new_g, new_b = colorsys.hsv_to_rgb(nH, nS, oV)
+            new_alpha = current_color.a
+
+            tintedSurface.set_at((x, y), (int(new_r * 255), int(new_g * 255), int(new_b * 255), new_alpha))
+
+    return tintedSurface
 
 def recolourImage(surface, colour):
     surface = surface.convert_alpha()
@@ -75,6 +99,7 @@ class Assets():
                 self.wool = pygame.image.load("textures/light_blue_wool.png")
                 self.soul_sand = pygame.image.load("textures/soul_sand.png")
                 self.note = pygame.image.load("textures/note.png")
+                self.waxed_lightly_weathered_cut_copper_stairs = pygame.image.load("textures/lightly_waxed_weathered_cut_copper_stairs.png")
         self.BLOCKS = Blocks()
 
     def refreshAssets(self):
@@ -134,10 +159,18 @@ class Gui():
         class Data():
             def __init__(self) -> None:
                 self.isStartupTick = True
+                class ElementLayout():
+                    def __init__(self) -> None:
+                        self.layout1 = [
+                            {
+                                
+                            },
+                        ]
                 self.drawerX_True = 0
                 self.drawerX = self.drawerX_True
                 self.drawerX += (self.drawerX - self.drawerX_True) / 2
                 self.drawerIsOpen = False
+                self.rainbowColourOoooOOOOooooOOOO = 0
                 self.drawer = [
                     {
                         "state": "default",
@@ -164,14 +197,14 @@ class Gui():
                         "state": "default",
                         "text": "Help",
                         "font": assets.GUI.font.minecraft.italic,
-                        "img": assets.BLOCKS.note,
+                        "img": recolor_surface(assets.BLOCKS.note, (colorsys.hsv_to_rgb(0, 1, 1))),
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
                         "state": "default",
                         "text": "Credits",
                         "font": assets.GUI.font.minecraft.bold_italic,
-                        "img": assets.BLOCKS.hay,
+                        "img": assets.BLOCKS.waxed_lightly_weathered_cut_copper_stairs,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                 ]
@@ -266,6 +299,34 @@ class Gui():
 
             if self.data.isStartupTick:
                         
+                # 88 88 90 is scroll bar thingy colour RGB
+                img = assets.BLOCKS.note_block
+                self.SidebarGUI_overlay.blit(
+                    pygame.transform.scale(
+                        recolourImage(img, (0, 0, 0)),
+                        (
+                            img.get_width() * self.scale,
+                            img.get_height() * self.scale
+                        )
+                    ),
+                    (
+                        self.scale * 3 + self.scale,
+                        (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + self.scale
+                    )
+                )
+                self.SidebarGUI_overlay.blit(
+                    pygame.transform.scale(
+                        img,
+                        (
+                            img.get_width() * self.scale,
+                            img.get_height() * self.scale
+                        )
+                    ),
+                    (
+                        self.scale * 3,
+                        (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
+                    )
+                )
                 
                 img = self.data.drawer[i]["img"]
                 self.SidebarGUI_overlay.blit(
@@ -281,7 +342,6 @@ class Gui():
                         (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2) + self.scale
                     )
                 )
-                img = self.data.drawer[i]["img"]
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
                         img,
@@ -334,6 +394,8 @@ class Gui():
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
 
+            pygame.draw.rect(self.SidebarGUI_overoverlay, (88, 88, 90), pygame.Rect(defState.get_width() * self.scale - self.scale * 3, 0, defState.get_width() * self.scale - self.scale * 2, WIN.get_height()))
+
         self.data.isStartupTick = False
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
@@ -346,12 +408,13 @@ class Gui():
         for event in pygame.event.get():
             print(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}")
             if False: raise Exception("Error: False == True")
+            elif event.type == pygame.WINDOWLEAVE:
+                self.data.drawerIsOpen = False
             elif event.type == pygame.QUIT:
                 game.DONE = True
                 pygame.quit()
                 quit()
             elif event.type == pygame.MOUSEMOTION and inp.mouse.mousePosX < self.data.drawerX:
-                GUI.update()
                 self.data.drawerIsOpen = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 GUI.is_mbu = True
