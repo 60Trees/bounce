@@ -544,9 +544,9 @@ class Gui():
                 quit()
             elif event.type == pygame.MOUSEMOTION and inp.mouse.mousePosX < self.data.drawerX:
                 self.data.drawerIsOpen = True
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 GUI.is_mbu = True
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and event.button == 1:
                 if False: raise Exception("Error: False == True")
                 elif event.key == pygame.K_MINUS:
                     if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
