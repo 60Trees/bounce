@@ -1,89 +1,103 @@
 import pygame
 import sys
 
-# Initialize Pygame
-pygame.init()
+def rgb_to_hue(r, g, b):
+    """ Convert RGB to Hue value. """
+    r /= 255.0
+    g /= 255.0
+    b /= 255.0
+    mx = max(r, g, b)
+    mn = min(r, g, b)
 
-# Set up display
-width, height = 800, 600
-screen = pygame.display.set_mode((width, height))  # Create a window with the specified dimensions
-pygame.display.set_caption("Image Movement and Cropping Example")
+    if mx == mn:
+        return 0  # Achromatic (no hue)
 
-# Load the image
-image = pygame.image.load('textures/glowstone.png')  # Replace with your image path
-image = pygame.transform.scale(image, (image.get_width() * 2, image.get_height() * 2))
-image = pygame.transform.scale(image, (image.get_width() * 2, image.get_height() * 2))
-image = pygame.transform.scale(image, (image.get_width() * 2, image.get_height() * 2))
-image_rect = image.get_rect()  # Get the rectangle area of the image for positioning
+    d = mx - mn
+    if mx == r:
+        h = (60 * ((g - b) / d) + 360) % 360
+    elif mx == g:
+        h = (60 * ((b - r) / d) + 120) % 360
+    elif mx == b:
+        h = (60 * ((r - g) / d) + 240) % 360
 
-# Variables for cropping from each side
-crop_left = 0
-crop_top = 0
-crop_right = 0
-crop_bottom = 0
+    return h
 
-# Variables for image position
-image_x = 0
-image_y = 0
-image_speed = 5  # Speed at which the image moves
+def hsv_to_rgb(hsv):
+    """ Convert HSV back to RGB color space. """
+    h, s, v = hsv
+    if s == 0:
+        r = g = b = int(v * 255)
+    else:
+        i = int(h // 60) % 6
+        f = (h / 60) - i
+        p = int(v * (1 - s) * 255)
+        q = int(v * (1 - f * s) * 255)
+        t = int(v * (1 - (1 - f) * s) * 255)
+        v = int(v * 255)
 
-# Main loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:  # Check if the window is closed
-            running = False
-        if event.type == pygame.KEYDOWN:  # Check for key presses
-            if event.key == pygame.K_DELETE:  # Reset everything if Delete key is pressed
-                crop_left = 0
-                crop_top = 0
-                crop_right = 0
-                crop_bottom = 0
-                image_x = 0
-                image_y = 0
+        if i == 0:
+            r, g, b = v, t, p
+        elif i == 1:
+            r, g, b = q, v, p
+        elif i == 2:
+            r, g, b = p, v, t
+        elif i == 3:
+            r, g, b = p, q, v
+        elif i == 4:
+            r, g, b = t, p, v
+        elif i == 5:
+            r, g, b = v, p, q
 
-    # Get the state of all keys
-    keys = pygame.key.get_pressed()
+    return (r, g, b)
 
-    # Control movement with WSAD keys
-    if keys[pygame.K_w]:  # Move up
-        image_y -= image_speed
-    if keys[pygame.K_s]:  # Move down
-        image_y += image_speed
-    if keys[pygame.K_a]:  # Move left
-        image_x -= image_speed
-    if keys[pygame.K_d]:  # Move right
-        image_x += image_speed
+def adjustTint(surface, RGB):
+    """ Adjust the tint of the surface based on the provided RGB value. """
+    # Extract hue from the RGB input
+    hue = rgb_to_hue(*RGB)
 
-    # Control cropping with arrow keys
-    if keys[pygame.K_UP]:  # Crop from the top
-        crop_top += 1
-    if keys[pygame.K_DOWN]:  # Crop from the bottom
-        crop_bottom += 1
-    if keys[pygame.K_LEFT]:  # Crop from the left
-        crop_left += 1
-    if keys[pygame.K_RIGHT]:  # Crop from the right
-        crop_right += 1
+    # Create a new surface for the adjusted pixels
+    finished_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
 
-    # Calculate the new cropped rectangle
-    cropped_rect = pygame.Rect(
-        crop_left,
-        crop_top,
-        image_rect.width - crop_left - crop_right,
-        image_rect.height - crop_top - crop_bottom
-    )
+    for x in range(surface.get_width()):
+        for y in range(surface.get_height()):
+            r, g, b, a = surface.get_at((x, y))
+            # Convert brightness to a scale from 0 to 1
+            brightness = (r + g + b) / (3 * 255)  # Average of RGB
+            # Adjust based on the pixel's alpha (transparency)
+            opacity = a / 255.0
+            
+            # Calculate the new color using HSV
+            new_color = hsv_to_rgb((hue, 1, brightness * opacity))
+            
+            # Set the new color with adjusted opacity
+            finished_surface.set_at((x, y), (*new_color, int(a)))
 
-    # Fill the screen with white color
-    screen.fill((255, 255, 255))
+    return finished_surface
 
-    # Check if the cropped rectangle is valid
-    if cropped_rect.width > 0 and cropped_rect.height > 0:
-        # Blit (draw) the cropped image onto the screen at the current position
-        screen.blit(image, (image_x, image_y), cropped_rect)
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption('Tint Adjustment')
 
-    # Update the display with the new frame
-    pygame.display.flip()
+    # Load the image
+    image = pygame.image.load("textures/note.png").convert_alpha()
+    image = pygame.transform.scale(image, (image.get_width() * 4, image.get_height() * 4))
+    image = pygame.transform.scale(image, (image.get_width() * 4, image.get_height() * 4))
+    image = pygame.transform.scale(image, (image.get_width() * 4, image.get_height() * 4))
 
-# Quit Pygame
-pygame.quit()
-sys.exit()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # Example RGB value for tinting
+        RGB = (16, 250, 124)
+        tinted_surface = adjustTint(image, RGB)
+
+        screen.fill((255, 255, 255))  # Clear the screen
+        screen.blit(tinted_surface, (0, 0))  # Draw the tinted surface
+        pygame.display.flip()
+
+if __name__ == '__main__':
+    main()
