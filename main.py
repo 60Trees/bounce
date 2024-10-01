@@ -171,8 +171,13 @@ class Gui():
                                 
                             },
                         ]
+                        
                 self.drawerX_True = 0
                 self.drawerX = self.drawerX_True
+                
+                self.drawerY_True = 0
+                self.drawerY = self.drawerY_True
+                
                 self.drawerX += (self.drawerX - self.drawerX_True) / 2
                 self.drawerIsOpen = False
                 self.rainbowColourOoooOOOOooooOOOO = 0
@@ -378,7 +383,7 @@ class Gui():
         for i in range(len(self.data.drawer)):
             pos = (0, i * defState.get_height() * self.scale)
             if self.data.drawerIsOpen:
-                coll = pygame.Rect(*pos, defState.get_width()*self.scale, defState.get_height()*self.scale).collidepoint(pygame.mouse.get_pos())
+                coll = pygame.Rect(* pos, defState.get_width() * self.scale, defState.get_height() * self.scale).collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1] - self.data.drawerY * self.scale))
             else: coll = False
             if coll:
                 changed = True
@@ -495,7 +500,7 @@ class Gui():
                     )
                 )
 
-            pygame.draw.rect(self.SidebarGUI_overoverlay, (30, 30, 31), pygame.Rect(self.data.drawerX - self.scale, 0, self.data.drawerX, WIN.get_height()))
+            pygame.draw.rect(self.SidebarGUI_overoverlay, (30, 30, 31), pygame.Rect(self.data.drawerX - self.scale, 0, self.data.drawerX, self.realWinSize[1]))
             try:
                 if doGlint:
                     self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
@@ -517,24 +522,33 @@ class Gui():
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
 
-            pygame.draw.rect(self.SidebarGUI_overoverlay, (88, 88, 90), pygame.Rect(defState.get_width() * self.scale - self.scale * 3, 0, defState.get_width() * self.scale - self.scale * 2, WIN.get_height()))
+            pygame.draw.rect(self.SidebarGUI_overoverlay, (88, 88, 90), pygame.Rect(
+                defState.get_width() * self.scale - self.scale * 6,
+                0,
+                self.scale * 2,
+                self.realWinSize[1]))
 
         self.data.isStartupTick = False
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
         
-        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
-        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
-        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0), (0, 0, self.data.drawerX, WIN.get_height()))
+        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
 
     def tick(self):
         for event in pygame.event.get():
-            print(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}")
-            try: print(f"Event key: {event.key}")
-            except: pass
-            try: print(f"Event button: {event.button}")
-            except: pass
-            print("-" * len(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}"))
+            if False:
+                print(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}")
+                try: print(f"Event key: {event.key}")
+                except: pass
+                try: print(f"Event button: {event.button}")
+                except: pass
+                try: print(f"Event X: {event.x}")
+                except: pass
+                try: print(f"Event Y: {event.y}")
+                except: pass
+                print("-" * len(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}"))
             if False: raise Exception("Error: False == True")
             elif event.type == pygame.WINDOWLEAVE:
                 self.data.drawerIsOpen = False
@@ -544,9 +558,13 @@ class Gui():
                 quit()
             elif event.type == pygame.MOUSEMOTION and inp.mouse.mousePosX < self.data.drawerX:
                 self.data.drawerIsOpen = True
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                GUI.is_mbu = True
-            if event.type == pygame.KEYDOWN and event.button == 1:
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1: GUI.is_mbu = True
+            elif event.type == pygame.MOUSEWHEEL and self.data.drawerIsOpen:
+                self.data.drawerY_True += event.y * 10
+                print(self.data.drawerY_True)
+                print(self.realWinSize[1] - WIN.get_height())
+            if event.type == pygame.KEYDOWN:
                 if False: raise Exception("Error: False == True")
                 elif event.key == pygame.K_MINUS:
                     if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
@@ -560,6 +578,8 @@ class Gui():
                         GUI.update()
                     else:
                         self.data.drawerX += 10
+                elif event.key == pygame.K_ESCAPE:
+                    GUI.update()
 
         if inp.mouse.mousePosX > self.data.drawerX:
             self.data.drawerIsOpen = False
@@ -568,8 +588,10 @@ class Gui():
             self.data.drawerX_True = assets.GUI.drawer.default.get_width() * self.scale
         else:
             self.data.drawerX_True = self.scale * 23
-        
+        if self.data.drawerY_True > 0: self.data.drawerY_True = 0
+        if self.data.drawerY_True > 0: self.data.drawerY_True = 0
         self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 4
+        self.data.drawerY += (-(self.data.drawerY - self.data.drawerY_True)) / 4
             
 GUI = Gui()
 
@@ -595,7 +617,7 @@ while not game.DONE:
     GUI.tick()
 
     GUI.redrawGUI()
-    WIN.blit(GUI.GUISurface, (0, 0))
+    WIN.blit(GUI.GUISurface, (0, GUI.data.drawerY * GUI.scale))
 
     game.isSetupTick = False
 
