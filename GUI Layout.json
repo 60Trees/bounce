@@ -1,0 +1,602 @@
+{
+    "info-panel": {
+        "style": {
+            "center": true
+        },
+        "bg-type":"",
+        "contents": [
+            {
+                "type": "image",
+                "content": "assets.GUI.title",
+                "style": {
+                    "align": "centre",
+                    "padding-top": 1
+                }
+            },
+            {
+                "type": "p",
+                "content": "What do you want to do?",
+                "font": "h1"
+            },
+            {
+                "type": "container",
+                "contents": [
+                    {
+                        "type": "button",
+                        "style": {
+                            "button-type": "colour",
+                            "button-colour": [0, 255, 0]
+                        },
+                        "content": "button"
+                    }
+                ],
+                "style": {
+                    "grid": true,
+                    "grid-rows": 1,
+                    "grid-spacing": 1
+                }
+            }
+        ]
+    },
+    "sidebar": [
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "My Projects",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.note_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Frigate freak snatch appearance fortunate farmer publicize frock ruby cooing tab halt offset"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "Options",
+            "font": "assets.GUI.font.minecraft.reg",
+            "img": "assets.BLOCKS.soul_sand",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Fishery film molecule revitalisation move good-bye numeric otter flash laughable allegation heartbeat wind-chime instruction alloy seemly adjective scotch viola sharp lieu"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "Settings",
+            "font": "assets.GUI.font.minecraft.bold",
+            "img": "assets.BLOCKS.emerald_block",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Fun pocket bratwurst eager alight popcorn journalism historical councilman raisin dish surfboard anatomy statin pail boundary twine taxpayer unique maker pastoral"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "Help",
+            "font": "assets.GUI.font.minecraft.italic",
+            "img": "recolor_surface(assets.BLOCKS.note, (255, 0, 0))",
+            "imgBG": "assets.BLOCKS.note_block",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Absence man offset pain melodic belfry peek wren forelimb signature aback cucumber delay undress stacking specification cuticle counselor portion literature"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "Credits",
+            "font": "assets.GUI.font.minecraft.bold_italic",
+            "img": "assets.BLOCKS.lightly_waxed_weathered_cut_copper_stairs",
+            "imgBG": "",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Knowledgeable recovery coonskin minimum inject escalator campaign reaction flax seat duckling"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        },
+        {
+            "state": "default",
+            "prevState": "default",
+            "text": "Help",
+            "font": "assets.GUI.font.minecraft.italic",
+            "img": "recolor_surface(assets.BLOCKS.note, (255, 0, 0))",
+            "imgBG": "assets.BLOCKS.note_block",
+            "imgAnimState": 99,
+            "contents": {
+                "contents": [
+                    {
+                        "type": "h1",
+                        "content": "Stuff is here:",
+                        "font": "assets.GUI.font.minecraft.ten"
+                    },
+                    {
+                        "type": "header"
+                    },
+                    {
+                        "type": "p",
+                        "content": "Junk coordination bacon depressive mourn dock lime sea freedom rib embossing"
+                    },
+                    {
+                        "type": "footer"
+                    }
+                ],
+                "bg": {
+                    "colour": [
+                        10,
+                        10,
+                        10
+                    ]
+                }
+            }
+        }
+    ]
+}

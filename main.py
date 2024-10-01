@@ -1,28 +1,31 @@
 import colorsys
 from tkinter import filedialog
-import pygame, os, math, copy, tkinter
+from wonderwords import RandomWord
+import pygame, os, math, copy, tkinter, json
 
 pygame.init()
 
-def trimStr(s, n): return s[:-n] if n else s
+chopString=lambda s,n:s[:-n]
 
 clock = pygame.time.Clock()
 
 GUI_SCALE = 3
 
+rnWrd = RandomWord()
+
 # Window size, change as you wish
 winSize = (1000, 600)
 WIN = pygame.display.set_mode(winSize, pygame.RESIZABLE)
 
-def recolor_surface(sur, rgb):
+def recolor_surface(s, rgb):
     r, g, b = rgb
     h, _, _ = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
     colourHue = h
-    tintedSurface = pygame.Surface(sur.get_size(), pygame.SRCALPHA)
+    tintedSurface = pygame.Surface(s.get_size(), pygame.SRCALPHA)
 
-    for x in range(sur.get_width()):
-        for y in range(sur.get_height()):
-            current_color = sur.get_at((x, y))
+    for x in range(s.get_width()):
+        for y in range(s.get_height()):
+            current_color = s.get_at((x, y))
             oV = max(current_color.r, current_color.g, current_color.b) / 255.0
 
             nS = 1.0
@@ -78,7 +81,7 @@ class Assets():
                         self.pushing = pygame.image.load("textures/gui/other/_drawerTilePushedBeing.png")
                         self.push = pygame.image.load("textures/gui/other/_drawerTilePushed.png")
                 self.drawer = Drawer()
-
+                self.title = pygame.image.load("textures/gui/title.png")
                 class Animation():
                     def __init__(self) -> None:
                         self.blockGlintStages = []
@@ -164,13 +167,6 @@ class Gui():
         class Data():
             def __init__(self) -> None:
                 self.isStartupTick = True
-                class ElementLayout():
-                    def __init__(self) -> None:
-                        self.layout1 = [
-                            {
-                                
-                            },
-                        ]
                         
                 self.drawerX_True = 0
                 self.drawerX = self.drawerX_True
@@ -181,179 +177,47 @@ class Gui():
                 self.drawerX += (self.drawerX - self.drawerX_True) / 2
                 self.drawerIsOpen = False
                 self.rainbowColourOoooOOOOooooOOOO = 0
-                self.drawer = [
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "My Projects",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.note_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Options",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.soul_sand,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Settings",
-                        "font": assets.GUI.font.minecraft.bold,
-                        "img": assets.BLOCKS.emerald_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Help",
-                        "font": assets.GUI.font.minecraft.italic,
-                        "img": recolor_surface(assets.BLOCKS.note, (255, 0, 0)),
-                        "imgBG": assets.BLOCKS.note_block,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Credits",
-                        "font": assets.GUI.font.minecraft.bold_italic,
-                        "img": assets.BLOCKS.lightly_waxed_weathered_cut_copper_stairs,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "My Projects",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.note_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Options",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.soul_sand,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Settings",
-                        "font": assets.GUI.font.minecraft.bold,
-                        "img": assets.BLOCKS.emerald_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Help",
-                        "font": assets.GUI.font.minecraft.italic,
-                        "img": recolor_surface(assets.BLOCKS.note, (0, 255, 0)),
-                        "imgBG": assets.BLOCKS.emerald_block,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Credits",
-                        "font": assets.GUI.font.minecraft.bold_italic,
-                        "img": assets.BLOCKS.clay,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "My Projects",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.note_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Options",
-                        "font": assets.GUI.font.minecraft.reg,
-                        "img": assets.BLOCKS.soul_sand,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Settings",
-                        "font": assets.GUI.font.minecraft.bold,
-                        "img": assets.BLOCKS.emerald_block,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Help",
-                        "font": assets.GUI.font.minecraft.italic,
-                        "img": recolor_surface(assets.BLOCKS.note, (colorsys.hsv_to_rgb(0, 1, 1))),
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                    {
-                        "state": "default",
-                        "prevState": "default",
-                        "text": "Credits",
-                        "font": assets.GUI.font.minecraft.bold_italic,
-                        "img": assets.BLOCKS.lightly_waxed_weathered_cut_copper_stairs,
-                        "imgBG": None,
-                        "imgAnimState": len(assets.GUI.anim.blockGlintStages)
-                    },
-                ]
+
+                with open('GUI Layout.json', 'r') as file:
+                    self.gui = json.load(file)
+                
+                self.drawer = self.gui["sidebar"]
+
+
         self.data = Data()
         
-        self.realWinSize = (winSize[0], len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height())
+        self.realWinSize = (WIN.get_width(), len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height())
         
         self.SidebarGUI_underlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
         self.SidebarGUI_overlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
         self.SidebarGUI_overoverlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
+        self.SidebarGUI_scrolloverlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
         
         self.SidebarGUI_underlay.fill((1, 2, 3))
         self.SidebarGUI_overlay.fill((1, 2, 3))
         self.SidebarGUI_overoverlay.fill((1, 2, 3))
+        self.SidebarGUI_scrolloverlay.fill((1, 2, 3))
         
         self.SidebarGUI_underlay.set_colorkey((1, 2, 3))
         self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
         self.SidebarGUI_overoverlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_scrolloverlay.set_colorkey((1, 2, 3))
         
         self.GUISurface = pygame.Surface(self.realWinSize)
 
     def update(self):
         self.hasUpdated = True
         self.data.isStartupTick = True
+        self.redrawGUI()
 
     def redrawGUI(self):
-        #self.SidebarGUI_underlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
-        self.SidebarGUI_overoverlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
-        
+
         #self.SidebarGUI_underlay.fill((1, 2, 3))
         self.SidebarGUI_overoverlay.fill((1, 2, 3))
-        
-        #self.SidebarGUI_underlay.set_colorkey((1, 2, 3))
-        self.SidebarGUI_overoverlay.set_colorkey((1, 2, 3))
+        self.SidebarGUI_scrolloverlay.fill((1, 2, 3))
         
         if self.data.isStartupTick:
-            self.SidebarGUI_overlay = pygame.Surface(self.realWinSize, pygame.SRCALPHA, 32).convert_alpha()
             self.SidebarGUI_overlay.fill((1, 2, 3))
-            self.SidebarGUI_overlay.set_colorkey((1, 2, 3))
 
         self.GUISurface = pygame.Surface(self.realWinSize)
         
@@ -426,8 +290,8 @@ class Gui():
                         
                 # 88 88 90 is scroll bar thingy colour RGB
                 
-                if self.data.drawer[i]["imgBG"] != None:
-                    img = self.data.drawer[i]["imgBG"]
+                if self.data.drawer[i]["imgBG"] != "":
+                    img = eval(self.data.drawer[i]["imgBG"])
                     self.SidebarGUI_overlay.blit(
                         pygame.transform.scale(
                             recolourImage(img, (0, 0, 0)),
@@ -455,7 +319,7 @@ class Gui():
                         )
                     )
                     
-                img = self.data.drawer[i]["img"]
+                img = eval(self.data.drawer[i]["img"])
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
                         recolourImage(img, (0, 0, 0)),
@@ -483,7 +347,7 @@ class Gui():
                     )
                 )
                 
-                img = self.data.drawer[i]["font"].render(self.data.drawer[i]["text"], False, (255, 255, 255))
+                img = eval(self.data.drawer[i]["font"]).render(self.data.drawer[i]["text"], False, (255, 255, 255))
 
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
@@ -499,7 +363,7 @@ class Gui():
                     )
                 )
 
-            pygame.draw.rect(self.SidebarGUI_overoverlay, (30, 30, 31), pygame.Rect(self.data.drawerX - self.scale, 0, self.data.drawerX, self.realWinSize[1]))
+            pygame.draw.rect(self.SidebarGUI_overoverlay, (30, 30, 31), pygame.Rect(self.data.drawerX - self.scale, 0, self.scale, self.realWinSize[1]))
             try:
                 if doGlint:
                     self.data.drawer[self.buttonpressed]["imgAnimState"] = 0
@@ -521,7 +385,8 @@ class Gui():
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
 
-            pygame.draw.rect(self.SidebarGUI_overoverlay, (88, 88, 90), pygame.Rect(
+        if len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height() > WIN.get_height():
+            pygame.draw.rect(self.SidebarGUI_scrolloverlay, (88, 88, 90), pygame.Rect(
                 defState.get_width() * self.scale - self.scale * 6,
                 0,
                 self.scale * 2,
@@ -531,9 +396,10 @@ class Gui():
         self.hasUpdated = False
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
         
-        self.GUISurface.blit(self.SidebarGUI_underlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
-        self.GUISurface.blit(self.SidebarGUI_overlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
-        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_underlay, (0, GUI.data.drawerY * GUI.scale), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_overlay, (0, GUI.data.drawerY * GUI.scale), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_overoverlay, (0, GUI.data.drawerY * GUI.scale), (0, 0, self.data.drawerX, self.realWinSize[1]))
+        self.GUISurface.blit(self.SidebarGUI_scrolloverlay, (0, 0), (0, 0, self.data.drawerX, self.realWinSize[1]))
 
     def tick(self):
         for event in pygame.event.get():
@@ -561,22 +427,20 @@ class Gui():
                 if event.button == 1: GUI.is_mbu = True
             elif event.type == pygame.MOUSEWHEEL and self.data.drawerIsOpen:
                 self.data.drawerY_True += event.y * 10
-                print(self.data.drawerY_True)
-                print(self.realWinSize[1] - WIN.get_height())
             if event.type == pygame.KEYDOWN:
                 if False: raise Exception("Error: False == True")
                 elif event.key == pygame.K_MINUS:
-                    if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
-                        self.scale -= 1
-                        GUI.update()
-                    else:
-                        self.data.drawerX_True -= 10
+                    self.scale -= 1
+                    self.data.drawerX = self.data.drawerX_True
+                    self.data.drawerY = self.data.drawerY_True
+                    self.realWinSize = (WIN.get_width(), len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height())
+                    GUI.update()
                 elif event.key == pygame.K_EQUALS:
-                    if inp.keyboard.keysPressed[pygame.K_LSHIFT]:
-                        self.scale += 1
-                        GUI.update()
-                    else:
-                        self.data.drawerX += 10
+                    self.scale += 1
+                    self.data.drawerX = self.data.drawerX_True
+                    self.data.drawerY = self.data.drawerY_True
+                    self.realWinSize = (WIN.get_width(), len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height())
+                    GUI.update()
                 elif event.key == pygame.K_ESCAPE:
                     GUI.update()
 
@@ -588,9 +452,20 @@ class Gui():
         else:
             self.data.drawerX_True = self.scale * 23
         if self.data.drawerY_True > 0: self.data.drawerY_True = 0
-        if self.data.drawerY_True > 0: self.data.drawerY_True = 0
+        if self.data.drawerY_True * self.scale < -(self.realWinSize[1] - WIN.get_height()): self.data.drawerY_True = -(self.realWinSize[1] - WIN.get_height()) / self.scale
+
         self.data.drawerX += (-(self.data.drawerX - self.data.drawerX_True)) / 4
-        self.data.drawerY += (-(self.data.drawerY - self.data.drawerY_True)) / 4
+        
+        if len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height() > WIN.get_height():
+            self.data.drawerY += (-(self.data.drawerY - self.data.drawerY_True)) / 4
+        else:
+            self.data.drawerY_True = 0
+            self.data.drawerY = self.data.drawerY_True
+
+        if pygame.key.get_pressed()[pygame.K_EQUALS] or pygame.key.get_pressed()[pygame.K_PLUS]:
+            self.data.drawerX = self.data.drawerX_True
+            self.data.drawerY = self.data.drawerY_True
+
             
 GUI = Gui()
 
@@ -616,7 +491,7 @@ while not game.DONE:
     GUI.tick()
 
     GUI.redrawGUI()
-    WIN.blit(GUI.GUISurface, (0, GUI.data.drawerY * GUI.scale))
+    WIN.blit(GUI.GUISurface, (0, 0))
 
     game.isSetupTick = False
 
