@@ -188,7 +188,7 @@ class Gui():
                         "text": "My Projects",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.note_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -197,7 +197,7 @@ class Gui():
                         "text": "Options",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.soul_sand,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -206,7 +206,7 @@ class Gui():
                         "text": "Settings",
                         "font": assets.GUI.font.minecraft.bold,
                         "img": assets.BLOCKS.emerald_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -224,7 +224,7 @@ class Gui():
                         "text": "Credits",
                         "font": assets.GUI.font.minecraft.bold_italic,
                         "img": assets.BLOCKS.lightly_waxed_weathered_cut_copper_stairs,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -233,7 +233,7 @@ class Gui():
                         "text": "My Projects",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.note_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -242,7 +242,7 @@ class Gui():
                         "text": "Options",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.soul_sand,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -251,7 +251,7 @@ class Gui():
                         "text": "Settings",
                         "font": assets.GUI.font.minecraft.bold,
                         "img": assets.BLOCKS.emerald_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -269,7 +269,7 @@ class Gui():
                         "text": "Credits",
                         "font": assets.GUI.font.minecraft.bold_italic,
                         "img": assets.BLOCKS.clay,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -278,7 +278,7 @@ class Gui():
                         "text": "My Projects",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.note_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -287,7 +287,7 @@ class Gui():
                         "text": "Options",
                         "font": assets.GUI.font.minecraft.reg,
                         "img": assets.BLOCKS.soul_sand,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -296,7 +296,7 @@ class Gui():
                         "text": "Settings",
                         "font": assets.GUI.font.minecraft.bold,
                         "img": assets.BLOCKS.emerald_block,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -305,7 +305,7 @@ class Gui():
                         "text": "Help",
                         "font": assets.GUI.font.minecraft.italic,
                         "img": recolor_surface(assets.BLOCKS.note, (colorsys.hsv_to_rgb(0, 1, 1))),
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                     {
@@ -314,7 +314,7 @@ class Gui():
                         "text": "Credits",
                         "font": assets.GUI.font.minecraft.bold_italic,
                         "img": assets.BLOCKS.lightly_waxed_weathered_cut_copper_stairs,
-                        "imgBG": (),
+                        "imgBG": None,
                         "imgAnimState": len(assets.GUI.anim.blockGlintStages)
                     },
                 ]
@@ -426,7 +426,7 @@ class Gui():
                         
                 # 88 88 90 is scroll bar thingy colour RGB
                 
-                try:
+                if self.data.drawer[i]["imgBG"] != None:
                     img = self.data.drawer[i]["imgBG"]
                     self.SidebarGUI_overlay.blit(
                         pygame.transform.scale(
@@ -454,8 +454,7 @@ class Gui():
                             (i * defState.get_height() * self.scale) + (defState.get_height() * self.scale / 2 - img.get_height() * self.scale / 2)
                         )
                     )
-                except: pass
-                
+                    
                 img = self.data.drawer[i]["img"]
                 self.SidebarGUI_overlay.blit(
                     pygame.transform.scale(
