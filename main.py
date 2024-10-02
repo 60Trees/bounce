@@ -405,6 +405,18 @@ class Gui():
                 scrollbar_position = (current_scroll / max_scrollable_area) * (height_of_scrollbar - height_of_screen)
 
                 return -scrollbar_position
+            
+            def getScrollLevelFromY(scrollbar_y, height_of_element, height_of_screen, height_of_scrollbar):
+                # Calculate the maximum scrollable area
+                max_scrollable_area = height_of_element - height_of_screen
+
+                # Calculate the proportional scroll level from the scrollbar position
+                if height_of_scrollbar - height_of_screen > 0:  # Prevent division by zero
+                    scroll_level = (scrollbar_y / (height_of_scrollbar - height_of_screen)) * max_scrollable_area
+                else:
+                    scroll_level = 0  # Default to 0 if the scrollbar is not valid
+
+                return max(0, min(scroll_level, max_scrollable_area))  # Clamp the scroll level within bounds
 
             img = assets.GUI.scroll
             img = pygame.transform.scale(
