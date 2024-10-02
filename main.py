@@ -394,6 +394,18 @@ class Gui():
                     WIN.get_height()
                 )
             )
+            def setAppropriateYLevel(current_scroll, height_of_element, height_of_screen, height_of_scrollbar):
+                # Calculate the maximum scrollable area
+                max_scrollable_area = height_of_element - height_of_screen
+
+                # Ensure the current scroll is within the valid range
+                current_scroll = max(0, min(current_scroll, max_scrollable_area))
+
+                # Calculate the proportional position of the scrollbar
+                scrollbar_position = (current_scroll / max_scrollable_area) * (height_of_scrollbar - height_of_screen)
+
+                return -scrollbar_position
+
             img = assets.GUI.scroll
             img = pygame.transform.scale(
                 img,
@@ -406,7 +418,7 @@ class Gui():
                 img,
                 (
                     defState.get_width() * self.scale - self.scale * 8,
-                    -self.data.drawerY * self.scale,
+                    setAppropriateYLevel(-self.data.drawerY * self.scale, self.realWinSize[1], WIN.get_height(), img.get_height() - self.scale * 2),
                 )
             )
 
