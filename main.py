@@ -82,6 +82,7 @@ class Assets():
                         self.push = pygame.image.load("textures/gui/other/_drawerTilePushed.png")
                 self.drawer = Drawer()
                 self.title = pygame.image.load("textures/gui/title.png")
+                self.scroll = pygame.image.load("textures/gui/other/scroll.png")
                 class Animation():
                     def __init__(self) -> None:
                         self.blockGlintStages = []
@@ -387,10 +388,27 @@ class Gui():
 
         if len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height() > WIN.get_height():
             pygame.draw.rect(self.SidebarGUI_scrolloverlay, (88, 88, 90), pygame.Rect(
-                defState.get_width() * self.scale - self.scale * 6,
-                0,
-                self.scale * 2,
-                self.realWinSize[1]))
+                    defState.get_width() * self.scale - self.scale * 6,
+                    0,
+                    self.scale * 2,
+                    WIN.get_height()
+                )
+            )
+            img = assets.GUI.scroll
+            img = pygame.transform.scale(
+                img,
+                (
+                    img.get_width() * self.scale,
+                    img.get_height() * self.scale
+                )
+            )
+            self.SidebarGUI_scrolloverlay.blit(
+                img,
+                (
+                    defState.get_width() * self.scale - self.scale * 8,
+                    -self.data.drawerY * self.scale,
+                )
+            )
 
         self.data.isStartupTick = False
         self.hasUpdated = False
