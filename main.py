@@ -133,21 +133,33 @@ class Input():
     def __init__(self) -> None:
         class Keyboard():
             def __init__(self) -> None:
-                self.keysPressed = pygame.key.get_pressed()
-        self.keyboard = Keyboard()
+                self.pressed = pygame.key.get_pressed()
+        self.KEYBOARD = Keyboard()
 
         class Mouse():
             def __init__(self) -> None:
-                self.mousePos = pygame.mouse.get_pos()
-                self.mousePosX, self.mousePosY = self.mousePos
-                self.mousePos = pygame.mouse.get_pos()
-        self.mouse = Mouse()
+                self.pos = pygame.mouse.get_pos()
+                self.pos = pygame.mouse.get_pos()
+                self.pressed = pygame.mouse.get_pressed()
+                self.up = [False, False, False]
+                self.down = [False, False, False]
+        self.MOUSE = Mouse()
 
-    def update(self):
-        self.keyboard.keysPressed = pygame.key.get_pressed()
-        self.mouse.mousePos = pygame.mouse.get_pos()
-        self.mouse.keysPressed = pygame.key.get_pressed()
-        self.mouse.mousePosX, self.mouse.mousePosY = self.mouse.mousePos
+    def update(self, event):
+        self.MOUSE.pos = pygame.mouse.get_pos()
+        self.MOUSE.pressed = pygame.mouse.get_pressed()
+        self.MOUSE.down = [False, False, False]
+        self.MOUSE.up = [False, False, False]
+        self.KEYBOARD.pressed = pygame.key.get_pressed()
+        try:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.MOUSE.down[event.button - 1] = True
+        except IndexError: pass
+        try:
+            if event.type == pygame.MOUSEBUTTONUP:
+                self.MOUSE.up[event.button - 1] = True
+        except IndexError: pass
+
 inp = Input()
 
 # GUI class...
@@ -162,9 +174,11 @@ class Gui():
     
     def __init__(self) -> None:
         self.hasUpdated = True
-        self.is_mbu = False # IS Mouse Button Up
         self.buttonpressed = 0#-1
         self.scale = GUI_SCALE
+
+        self.isScrollingScrollbar = False
+        self.scrollingScrollBarY_Difference = 0
         class Data():
             def __init__(self) -> None:
                 self.isStartupTick = True
@@ -206,6 +220,9 @@ class Gui():
         
         self.GUISurface = pygame.Surface(self.realWinSize)
 
+        self.getY = lambda curScr, elementHeight, scrHeight, scrollbarHeight: -((max(0, min(curScr, elementHeight - scrHeight)) / (elementHeight - scrHeight)) * (scrollbarHeight - scrHeight))
+        self.setY = lambda scrollbarY, elementHeight, scrHeight, scrollbarHeight: max(0, min(-scrollbarY / (scrollbarHeight - scrHeight) * (elementHeight - scrHeight), elementHeight - scrHeight))
+
     def update(self):
         self.hasUpdated = True
         self.data.isStartupTick = True
@@ -246,9 +263,12 @@ class Gui():
                 )
             )
         for i in range(len(self.data.drawer)):
-            pos = (0, i * defState.get_height() * self.scale)
             if self.data.drawerIsOpen:
-                coll = pygame.Rect(* pos, defState.get_width() * self.scale, defState.get_height() * self.scale).collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1] - self.data.drawerY * self.scale))
+                coll = pygame.Rect(
+                    0,
+                    i * defState.get_height() * self.scale,
+                    defState.get_width() * self.scale - self.scale * 9,
+                    defState.get_height() * self.scale).collidepoint((inp.MOUSE.pos[0], inp.MOUSE.pos[1] - self.data.drawerY * self.scale))
             else: coll = False
             if coll:
                 changed = True
@@ -262,13 +282,13 @@ class Gui():
                 img = self.getImgDrawerFromStr(["default", "pushed"][self.buttonpressed == i])
                 self.data.drawer[i]["state"] = ["default", "pushed"][self.buttonpressed == i]
             if coll and self.buttonpressed == i: changed = False
-            if self.is_mbu and coll:
+            if inp.MOUSE.up[0] and coll:
                 #if self.buttonpressed == i:
                 #    self.buttonpressed = -1
                 #else:
                 doGlint = True
                 self.buttonpressed = i
-                self.is_mbu = False
+                inp.MOUSE.up[0] = False
                 
             if self.data.isStartupTick or self.data.drawer[i]["prevState"] != self.data.drawer[i]["state"]:
                 self.SidebarGUI_underlay.blit(
@@ -386,7 +406,7 @@ class Gui():
                 self.data.drawer[i]["imgAnimState"] += 0.5
             except IndexError: pass
 
-        if len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height() > WIN.get_height():
+        if len(self.data.drawer) * self.scale * self.getImgDrawerFromStr("default").get_height() > WIN.get_height(): # Checks if it needs to scroll or not
             pygame.draw.rect(self.SidebarGUI_scrolloverlay, (88, 88, 90), pygame.Rect(
                     defState.get_width() * self.scale - self.scale * 6,
                     0,
@@ -394,30 +414,7 @@ class Gui():
                     WIN.get_height()
                 )
             )
-            def setAppropriateYLevel(current_scroll, height_of_element, height_of_screen, height_of_scrollbar):
-                # Calculate the maximum scrollable area
-                max_scrollable_area = height_of_element - height_of_screen
-
-                # Ensure the current scroll is within the valid range
-                current_scroll = max(0, min(current_scroll, max_scrollable_area))
-
-                # Calculate the proportional position of the scrollbar
-                scrollbar_position = (current_scroll / max_scrollable_area) * (height_of_scrollbar - height_of_screen)
-
-                return -scrollbar_position
             
-            def getScrollLevelFromY(scrollbar_y, height_of_element, height_of_screen, height_of_scrollbar):
-                # Calculate the maximum scrollable area
-                max_scrollable_area = height_of_element - height_of_screen
-
-                # Calculate the proportional scroll level from the scrollbar position
-                if height_of_scrollbar - height_of_screen > 0:  # Prevent division by zero
-                    scroll_level = (scrollbar_y / (height_of_scrollbar - height_of_screen)) * max_scrollable_area
-                else:
-                    scroll_level = 0  # Default to 0 if the scrollbar is not valid
-
-                return max(0, min(scroll_level, max_scrollable_area))  # Clamp the scroll level within bounds
-
             img = assets.GUI.scroll
             img = pygame.transform.scale(
                 img,
@@ -426,17 +423,39 @@ class Gui():
                     img.get_height() * self.scale
                 )
             )
+            scrollBarSze = pygame.Rect(
+                defState.get_width() * self.scale - self.scale * 8,
+                self.getY(-self.data.drawerY * self.scale, self.realWinSize[1], WIN.get_height(), img.get_height() - self.scale * 2),
+                img.get_width(),
+                img.get_height() - self.scale * 2
+            )
+            
+            if scrollBarSze.collidepoint(inp.MOUSE.pos) and inp.MOUSE.pressed[0] and not self.isScrollingScrollbar:
+                self.isScrollingScrollbar = True
+                self.scrollingScrollBarY_Difference = scrollBarSze.y - inp.MOUSE.pos[1]
+                print(self.scrollingScrollBarY_Difference)
+            
+            if not inp.MOUSE.pressed[0]:
+                self.isScrollingScrollbar = False
+            
+            if self.isScrollingScrollbar:
+                changed = True
+                scrollBarSze.y = inp.MOUSE.pos[1] + self.scrollingScrollBarY_Difference
+                self.data.drawerY_True = -self.setY(scrollBarSze[1], self.realWinSize[1], WIN.get_height(), img.get_height() - self.scale * 2) / self.scale
+
+
             self.SidebarGUI_scrolloverlay.blit(
                 img,
                 (
-                    defState.get_width() * self.scale - self.scale * 8,
-                    setAppropriateYLevel(-self.data.drawerY * self.scale, self.realWinSize[1], WIN.get_height(), img.get_height() - self.scale * 2),
+                    scrollBarSze[0],
+                    scrollBarSze[1],
                 )
             )
 
         self.data.isStartupTick = False
         self.hasUpdated = False
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed else pygame.SYSTEM_CURSOR_ARROW)
+
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if changed or scrollBarSze.collidepoint(inp.MOUSE.pos) else pygame.SYSTEM_CURSOR_ARROW)
         
         self.GUISurface.blit(self.SidebarGUI_underlay, (0, GUI.data.drawerY * GUI.scale), (0, 0, self.data.drawerX, self.realWinSize[1]))
         self.GUISurface.blit(self.SidebarGUI_overlay, (0, GUI.data.drawerY * GUI.scale), (0, 0, self.data.drawerX, self.realWinSize[1]))
@@ -445,6 +464,7 @@ class Gui():
 
     def tick(self):
         for event in pygame.event.get():
+            inp.update(event)
             if False:
                 print(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}")
                 try: print(f"Event key: {event.key}")
@@ -457,16 +477,14 @@ class Gui():
                 except: pass
                 print("-" * len(f"Event ID: {event.type}, Event Name: {pygame.event.event_name(event.type)}"))
             if False: raise Exception("Error: False == True")
-            elif event.type == pygame.WINDOWLEAVE:
+            elif event.type == pygame.WINDOWLEAVE and not self.isScrollingScrollbar:
                 self.data.drawerIsOpen = False
             elif event.type == pygame.QUIT:
                 game.DONE = True
                 pygame.quit()
                 quit()
-            elif event.type == pygame.MOUSEMOTION and inp.mouse.mousePosX < self.data.drawerX:
+            elif event.type == pygame.MOUSEMOTION and inp.MOUSE.pos[0] < self.data.drawerX:
                 self.data.drawerIsOpen = True
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1: GUI.is_mbu = True
             elif event.type == pygame.MOUSEWHEEL and self.data.drawerIsOpen:
                 self.data.drawerY_True += event.y * 10
             if event.type == pygame.KEYDOWN:
@@ -486,7 +504,7 @@ class Gui():
                 elif event.key == pygame.K_ESCAPE:
                     GUI.update()
 
-        if inp.mouse.mousePosX > self.data.drawerX:
+        if inp.MOUSE.pos[0] > self.data.drawerX and not self.isScrollingScrollbar:
             self.data.drawerIsOpen = False
 
         if self.data.drawerIsOpen:
@@ -507,8 +525,10 @@ class Gui():
         if pygame.key.get_pressed()[pygame.K_EQUALS] or pygame.key.get_pressed()[pygame.K_PLUS]:
             self.data.drawerX = self.data.drawerX_True
             self.data.drawerY = self.data.drawerY_True
+        
+        if self.scale <= 0:
+            self.scale = 1
 
-            
 GUI = Gui()
 
 # Game class...
@@ -528,7 +548,6 @@ GUI.redrawGUI()
 while not game.DONE:
     WIN.fill((0, 0, 0))
 
-    inp.update()
     game.tick()
     GUI.tick()
 
